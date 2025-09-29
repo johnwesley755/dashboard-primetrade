@@ -3,6 +3,7 @@ import User from "../models/User.js";
 import jwt from "jsonwebtoken";
 import { protect } from "../middleware/authMiddleware.js";
 import bcrypt from 'bcryptjs'; // <-- IMPORT BCRYPT
+import crypto from 'crypto'; // For generating reset tokens
 const router = express.Router();
 
 const generateToken = (id) => {
@@ -92,4 +93,69 @@ router.put('/change-password', protect, async (req, res) => {
     res.status(401).json({ message: 'Invalid old password' });
   }
 });
+
+// @desc    Request password reset
+// @route   POST /api/auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    
+    if (!user) {
+      return res.status(404).json({ message: 'User not found with this email' });
+    }
+    
+    // Generate reset token
+    const resetToken = crypto.randomBytes(20).toString('hex');
+    
+    // Set token and expiry on user document
+    user.resetPasswordToken = resetToken;
+    user.resetPasswordExpire = Date.now() + 3600000; // 1 hour
+    
+    await user.save();
+    
+    // In a real application, you would send an email with the reset link
+    // For this demo, we'll just return the token
+    res.json({ 
+      message: 'Password reset initiated. Check your email for instructions.',
+      resetToken // In production, don't send this directly to frontend
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
+// @desc    Reset password with token
+// @route   POST /api/auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, newPassword } = req.body;
+    
+    // Find user with this token and valid expiry
+    const user = await User.findOne({
+      resetPasswordToken: token,
+      resetPasswordExpire: { $gt: Date.now() }
+    });
+    
+    if (!user) {
+      return res.status(400).json({ message: 'Invalid or expired reset token' });
+    }
+    
+    // Set new password
+    user.password = newPassword;
+    
+    // Clear reset token fields
+    user.resetPasswordToken = undefined;
+    user.resetPasswordExpire = undefined;
+    
+    await user.save();
+    
+    res.json({ message: 'Password has been reset successfully' });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+});
+
 export default router;
