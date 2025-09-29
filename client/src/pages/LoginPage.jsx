@@ -78,9 +78,7 @@ const LoginPage = () => {
                 <label className="block text-gray-700 text-sm font-semibold" htmlFor="password">
                   Password
                 </label>
-                <a href="#" className="text-xs text-blue-600 hover:text-blue-800">
-                  Forgot Password?
-                </a>
+              
               </div>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
