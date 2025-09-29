@@ -16,7 +16,7 @@ const LoginPage = () => {
     
     try {
       const { data } = await axios.post(
-        "http://localhost:5001/api/auth/login",
+        "https://dashboard-primetrade.onrender.com/api/auth/login",
         { email, password }
       );
       localStorage.setItem("token", data.token);

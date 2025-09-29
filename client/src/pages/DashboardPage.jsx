@@ -24,7 +24,7 @@ const DashboardPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
-  const API_URL = "http://localhost:5001/api/notes";
+  const API_URL = "https://dashboard-primetrade.onrender.com/api/notes";
   const getAuthHeaders = () => ({
     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
   });

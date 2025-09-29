@@ -42,9 +42,7 @@ function App() {
             <Route path="/" element={<LoginPage />} />
           </Routes>
         </main>
-        <footer className="bg-gray-800 text-white text-center py-4 mt-auto">
-          <p>© {new Date().getFullYear()} MyNotesApp - All rights reserved</p>
-        </footer>
+     
       </div>
     </Router>
   );
